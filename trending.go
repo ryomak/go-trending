@@ -13,9 +13,9 @@ import (
 const (
 	DEFAULT_URL   = "https://github.com"
 	TRENDING_PATH = "trending"
-	TIME_TODAY = "daily"
-	TIME_WEEK = "weekly"
-	TIME_MONTH = "monthly"
+	TIME_TODAY    = "daily"
+	TIME_WEEK     = "weekly"
+	TIME_MONTH    = "monthly"
 )
 
 type Repository struct {
@@ -35,26 +35,26 @@ type trendingClient struct {
 type Option func(*trendingClient)
 
 func NewClient(ops ...Option) *trendingClient {
-  c := &trendingClient{
+	c := &trendingClient{
 		BaseUrlStr: DEFAULT_URL,
 		Client:     http.DefaultClient,
 	}
-  for _ ,op := range ops {
-    op(c)
-  }
+	for _, op := range ops {
+		op(c)
+	}
 	return c
 }
 
 func WithHttpClient(client *http.Client) Option {
-  return func(c *trendingClient){
-    c.Client = client
-  }
+	return func(c *trendingClient) {
+		c.Client = client
+	}
 }
 
 func WithBaseUrlStr(urlStr string) Option {
-  return func(c *trendingClient){
-    c.BaseUrlStr = urlStr
-  }
+	return func(c *trendingClient) {
+		c.BaseUrlStr = urlStr
+	}
 }
 
 func (c *trendingClient) GetRepository(time, lang string) ([]Repository, error) {
@@ -81,12 +81,12 @@ func (c *trendingClient) GetRepository(time, lang string) ([]Repository, error) 
 			repo.Owner = strs[1]
 			repo.URL = c.BaseUrlStr + un
 		}
-    repo.Description = strings.TrimSpace(s.Find("p").First().Text())
+		repo.Description = strings.TrimSpace(s.Find("p").First().Text())
 		repo.Language = s.Find("div.f6.text-gray.mt-2 > span.d-inline-block.ml-0.mr-3 > span:nth-child(2)").First().Text()
 		star, _ := strconv.Atoi(
-      strings.TrimSpace(
-        strings.Replace(s.Find("div.f6.text-gray.mt-2 >  a:nth-child(2)").First().Text(),",","",-1),
-      ))
+			strings.TrimSpace(
+				strings.Replace(s.Find("div.f6.text-gray.mt-2 >  a:nth-child(2)").First().Text(), ",", "", -1),
+			))
 		repo.Star = uint(star)
 		repos = append(repos, repo)
 	})
